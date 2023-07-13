@@ -20,8 +20,11 @@ router.post('/pushTweet',(req,res)=>{
     for(let trend of extractedTrend){
         Trend.findOne({ hashtagName : new RegExp (trend,'i') })
          .then(data=>{
+           
             if(data){
-                trendsId.push(data._id)
+                console.log(data)
+                trendsId.push(String(data._id))
+                console.log(trendsId)
             }
             
             else{
@@ -29,12 +32,13 @@ router.post('/pushTweet',(req,res)=>{
                     hashtagName : trend
                 })
                 newTrend.save().then(data =>
-                    trendsId.push(data._id))
+                    trendsId.push(String(data._id)))
             }
          })
        
        
     }
+    console.log(trendsId)
     const newTweet = new Tweet({
         date : currentDate,
         message : req.body.message,
