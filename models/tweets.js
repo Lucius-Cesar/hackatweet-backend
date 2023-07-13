@@ -5,7 +5,7 @@ const tweetSchema = mongoose.Schema({
     date : Date,
     message : String,
     user : { type: mongoose.Schema.Types.ObjectId, ref:'users'},
-    trend : { type: mongoose.Schema.Types.ObjectId, ref:'trends'},
+    trend : [{ type: mongoose.Schema.Types.ObjectId, ref:'trends'}],
 
 })
 
