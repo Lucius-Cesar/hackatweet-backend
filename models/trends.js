@@ -4,4 +4,6 @@ const trendSchema = mongoose.Schema({
   hashtagName: String,
 });
 const Trend = mongoose.model("trends", trendSchema);
-module.export = Trend;
+
+
+module.exports = Trend;

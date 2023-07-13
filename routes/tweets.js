@@ -1,6 +1,7 @@
 var express = require('express')
-var router = express.Router();
-const Tweet = require('../models/tweets');
+var router = express.Router()
+const Tweet = require('../models/tweets')
+const Trend = require('../models/trends')
 
 /* afficher tous les tweets */
 router.get('/allTweets',(req,res)=>{
@@ -12,8 +13,33 @@ router.get('/allTweets',(req,res)=>{
 
 /* ajouter un tweet */
 router.post('/pushTweet',(req,res)=>{
+    const currentDate = Date.now()
+    const trendPattern = /#([^ ]+)/gi
+    const extractedTrend = req.body.message.match(trendPattern)
+    let trendsId = []
+    for(let trend of extractedTrend){
+        Trend.findOne({ hashtagName : new RegExp (trend,'i') })
+         .then(data=>{
+            if(data){
+                trendsId.push(data._id)
+            }
+            
+            else{
+                newTrend = new Trend({
+                    hashtagName : trend
+                })
+                newTrend.save().then(data =>
+                    trendsId.push(data._id))
+            }
+         })
+       
+       
+    }
     const newTweet = new Tweet({
-        message : req.body.message
+        date : currentDate,
+        message : req.body.message,
+        user : req.body.userId,
+        trend : trendsId
     })
     newTweet.save().then((data)=>{
         res.json({newTweet : data})
@@ -23,7 +49,7 @@ router.post('/pushTweet',(req,res)=>{
 /* supprimer un tweet */
 
 router.delete('/deleteTweet', (req,res)=>{
-    Tweet.deleteOne({ id : req.body.tweetId}).then((data)=>{
+    Tweet.deleteOne({ _id : req.body.tweetId}).then((data)=>{
         if(data){
             res.json({delete : true})
         }
@@ -32,3 +58,5 @@ router.delete('/deleteTweet', (req,res)=>{
         }
     })
 })
+
+module.exports = router;
