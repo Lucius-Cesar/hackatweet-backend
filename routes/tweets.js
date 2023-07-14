@@ -6,7 +6,7 @@ ObjectId = require('mongodb').ObjectId,
 
 
 /* afficher tous les tweets */
-router.get('/allTweets',(req,res)=>{
+router.get('/',(req,res)=>{
     Tweet.find().populate('user')
     .then(data=>{
         res.json({tweets : data})
