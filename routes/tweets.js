@@ -2,9 +2,11 @@ var express = require('express')
 var router = express.Router()
 const Tweet = require('../models/tweets')
 const Trend = require('../models/trends')
+ObjectId = require('mongodb').ObjectId,
+
 
 /* afficher tous les tweets */
-router.get('/allTweets',(req,res)=>{
+router.get('/',(req,res)=>{
     Tweet.find().populate('user')
     .then(data=>{
         res.json({tweets : data})
@@ -15,40 +17,51 @@ router.get('/allTweets',(req,res)=>{
 router.post('/pushTweet',(req,res)=>{
     const currentDate = Date.now()
     const trendPattern = /#([^ ]+)/gi
-    const extractedTrend = req.body.message.match(trendPattern)
-    let trendsId = []
-    for(let trend of extractedTrend){
-        Trend.findOne({ hashtagName : new RegExp (trend,'i') })
-         .then(data=>{
-           
-            if(data){
-                console.log(data)
-                trendsId.push(String(data._id))
-                console.log(trendsId)
-            }
-            
-            else{
-                newTrend = new Trend({
-                    hashtagName : trend
-                })
-                newTrend.save().then(data =>
-                    trendsId.push(String(data._id)))
-            }
-         })
-       
-       
-    }
-    console.log(trendsId)
-    const newTweet = new Tweet({
+    const extractedTrends = req.body.message.match(trendPattern)
+    const newTweetObjectIdid = new ObjectId()
+    let trendIdsList = []
+    let newTrends = []
+
+
+    let newTweet = new Tweet({
+        _id : newTweetObjectIdid,
         date : currentDate,
         message : req.body.message,
         user : req.body.userId,
-        trend : trendsId
+        trends : []
     })
-    newTweet.save().then((data)=>{
-        res.json({newTweet : data})
+
+    async function extractAndAddTrendsFromTweets() {
+        for (const trend of extractedTrends) {
+          const trimmedTrend = trend.substr(1, trend.length);
+          const TrendData = await Trend.findOne({ hashtagName: new RegExp(trimmedTrend, 'i') });
+          console.log(TrendData);
+      
+          if (TrendData) {
+            trendIdsList.push(TrendData._id);
+          } else {
+            const newTrendObjectId = new ObjectId();
+            trendIdsList.push(newTrendObjectId);
+            newTrends.push({
+              _id: newTrendObjectId,
+              hashtagName: trimmedTrend,
+              creationDate: currentDate,
+            });
+          }
+        }
+      
+        // wait the creation of new trends
+        for (const newTrend of newTrends) {
+          await Trend.create(newTrend);
+        }
+      
+        newTweet.trends = trendIdsList;
+        newTweet.save();
+      }
+      
+      extractAndAddTrendsFromTweets();
+      res.json({ result: true });
     })
-})
 
 /* supprimer un tweet */
 

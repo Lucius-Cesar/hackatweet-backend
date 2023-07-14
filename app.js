@@ -11,6 +11,7 @@ require('./models/connection');
 //var usersRouter = require('./routes/users');
 var tweetsRouter = require ("./routes/tweets")
 var trendsRouter = require ("./routes/trends")
+var usersRouter = require ("./routes/users")
 
 var app = express();
 
@@ -24,6 +25,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 //app.use('/users', usersRouter);
 app.use('/tweets', tweetsRouter)
 app.use('/trends', trendsRouter)
+app.use('/users', usersRouter)
+
 
 
 module.exports = app;

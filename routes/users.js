@@ -1,9 +1,9 @@
-/*var express = require('express');
+var express = require('express');
 var router = express.Router();
 
 
-const User = require('../models/users');
-const { checkBody } = require('../modules/checkBody');
+const User = require('../models/users')
+const { checkBody } = require('../modules/checkbody');
 const uid2 = require('uid2');
 const bcrypt = require('bcrypt');
 
@@ -50,14 +50,14 @@ router.post('/signin', (req, res) => {
   });
 });
 
-router.get('/canBookmark/:token', (req, res) => {
+router.get('/checkToken/:token', (req, res) => {
   User.findOne({ token: req.params.token }).then(data => {
     if (data) {
-      res.json({ result: true, canBookmark: data.canBookmark });
+      res.json({ result: true});
     } else {
       res.json({ result: false, error: 'User not found' });
     }
   });
 });
 
-module.exports = router;*/
+module.exports = router;
