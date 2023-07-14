@@ -4,7 +4,7 @@ const tweetSchema = mongoose.Schema({
 
     date : Date,
     message : String,
-    username : String,
+    user : { type: mongoose.Schema.Types.ObjectId, ref:'users'},
     trends : [{ type: mongoose.Schema.Types.ObjectId, ref:'trends'}],
 
 })
