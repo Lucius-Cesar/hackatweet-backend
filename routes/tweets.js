@@ -6,7 +6,7 @@ ObjectId = require('mongodb').ObjectId,
 
 
 /* afficher tous les tweets */
-router.get('/',(req,res)=>{
+router.get('/allTweets',(req,res)=>{
     Tweet.find().populate('user')
     .then(data=>{
         res.json({tweets : data})
@@ -33,8 +33,7 @@ router.post('/pushTweet',(req,res)=>{
 
     async function extractAndAddTrendsFromTweets() {
         for (const trend of extractedTrends) {
-          const trimmedTrend = trend.substr(1, trend.length);
-          const TrendData = await Trend.findOne({ hashtagName: new RegExp(trimmedTrend, 'i') });
+          const TrendData = await Trend.findOne({ hashtagName: new RegExp(trend, 'i') });
           console.log(TrendData);
       
           if (TrendData) {
@@ -44,7 +43,7 @@ router.post('/pushTweet',(req,res)=>{
             trendIdsList.push(newTrendObjectId);
             newTrends.push({
               _id: newTrendObjectId,
-              hashtagName: trimmedTrend,
+              hashtagName: trend,
               creationDate: currentDate,
             });
           }
@@ -62,7 +61,7 @@ router.post('/pushTweet',(req,res)=>{
       extractAndAddTrendsFromTweets();
       res.json({ result: true });
     })
-
+    
 /* supprimer un tweet */
 
 router.delete('/deleteTweet', (req,res)=>{
